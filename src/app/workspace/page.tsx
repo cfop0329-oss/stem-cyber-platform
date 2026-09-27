@@ -1,23 +1,36 @@
 'use client';
 
 import { ReactFlowProvider } from '@xyflow/react';
-import Canvas from './components/Canvas';
-import ComponentPalette from './components/ComponentPalette';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import LogicWorkspace from './components/LogicWorkspace';
+import AlgoWorkspace from './components/AlgoWorkspace';
+import NetworkWorkspace from './components/NetworkWorkspace';
+import AIWorkspace from './components/AIWorkspace';
+
+function WorkspaceContent() {
+  const searchParams = useSearchParams();
+  const mode = searchParams.get('mode') || 'logic';
+
+  if (mode === 'algo') return <AlgoWorkspace />;
+  if (mode === 'network') return <NetworkWorkspace />;
+  if (mode === 'ai') return <AIWorkspace />;
+
+  return (
+    <ReactFlowProvider>
+      <LogicWorkspace />
+    </ReactFlowProvider>
+  );
+}
 
 export default function WorkspacePage() {
   return (
-    <ReactFlowProvider>
-      <div className="flex h-screen w-screen overflow-hidden bg-cyber-bg">
-        {/* Левая панель: Палитра компонентов */}
-        <aside className="w-72 border-r border-gray-800 bg-cyber-panel flex flex-col z-10">
-          <ComponentPalette />
-        </aside>
-
-        {/* Центр: Бесконечный холст на всю ширину */}
-        <main className="flex-1 relative cyber-grid-bg">
-          <Canvas />
-        </main>
+    <Suspense fallback={
+      <div className="flex h-screen w-screen items-center justify-center bg-cyber-bg">
+        <div className="text-cyan-400 font-mono text-xl animate-pulse">Загрузка модуля...</div>
       </div>
-    </ReactFlowProvider>
+    }>
+      <WorkspaceContent />
+    </Suspense>
   );
 }
