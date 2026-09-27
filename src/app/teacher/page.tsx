@@ -5,29 +5,31 @@ import Link from 'next/link';
 import { 
   ArrowLeft, Plus, BookOpen, Users, TrendingUp, 
   Cpu, GitBranch, Network, Brain, CheckCircle, 
-  Clock, AlertCircle, Trash2, Edit3, Eye
+  Clock, AlertCircle, Trash2, Edit3, Eye, LucideIcon
 } from 'lucide-react';
 
 type Tab = 'dashboard' | 'assignments' | 'students' | 'create';
+type ModuleType = 'logic' | 'algo' | 'network' | 'ai';
+type DifficultyType = 'easy' | 'medium' | 'hard';
 
 interface Assignment {
   id: string;
   title: string;
-  module: 'logic' | 'algo' | 'network' | 'ai';
+  module: ModuleType;
   description: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: DifficultyType;
   completedBy: number;
   totalStudents: number;
 }
 
-const MODULE_ICONS: Record<string, any> = {
+const MODULE_ICONS: Record<ModuleType, LucideIcon> = {
   logic: Cpu,
   algo: GitBranch,
   network: Network,
   ai: Brain,
 };
 
-const MODULE_COLORS: Record<string, string> = {
+const MODULE_COLORS: Record<ModuleType, string> = {
   logic: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10',
   algo: 'text-green-400 border-green-500/30 bg-green-500/10',
   network: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
@@ -75,11 +77,16 @@ const MOCK_STUDENTS = [
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [assignments, setAssignments] = useState<Assignment[]>(MOCK_ASSIGNMENTS);
-  const [newAssignment, setNewAssignment] = useState({
+  const [newAssignment, setNewAssignment] = useState<{
+    title: string;
+    module: ModuleType;
+    description: string;
+    difficulty: DifficultyType;
+  }>({
     title: '',
-    module: 'logic' as const,
+    module: 'logic',
     description: '',
-    difficulty: 'medium' as const,
+    difficulty: 'medium',
   });
 
   const createAssignment = () => {
@@ -382,6 +389,7 @@ export default function TeacherDashboard() {
                     return (
                       <button
                         key={m}
+                        type="button"
                         onClick={() => setNewAssignment({ ...newAssignment, module: m })}
                         className={`p-3 rounded-lg border font-mono text-xs transition-all flex flex-col items-center gap-2 ${
                           isActive
@@ -403,6 +411,7 @@ export default function TeacherDashboard() {
                   {(['easy', 'medium', 'hard'] as const).map(d => (
                     <button
                       key={d}
+                      type="button"
                       onClick={() => setNewAssignment({ ...newAssignment, difficulty: d })}
                       className={`p-3 rounded-lg border font-mono text-xs transition-all ${
                         newAssignment.difficulty === d
