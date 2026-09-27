@@ -22,6 +22,14 @@ interface Assignment {
   totalStudents: number;
 }
 
+// ✅ ДОБАВЛЕНО: Явный интерфейс для состояния нового задания
+interface NewAssignmentState {
+  title: string;
+  module: ModuleType;
+  description: string;
+  difficulty: DifficultyType;
+}
+
 const MODULE_ICONS: Record<ModuleType, LucideIcon> = {
   logic: Cpu,
   algo: GitBranch,
@@ -77,12 +85,9 @@ const MOCK_STUDENTS = [
 export default function TeacherDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [assignments, setAssignments] = useState<Assignment[]>(MOCK_ASSIGNMENTS);
-  const [newAssignment, setNewAssignment] = useState<{
-    title: string;
-    module: ModuleType;
-    description: string;
-    difficulty: DifficultyType;
-  }>({
+  
+  // ✅ ИСПРАВЛЕНО: Используем явный интерфейс NewAssignmentState
+  const [newAssignment, setNewAssignment] = useState<NewAssignmentState>({
     title: '',
     module: 'logic',
     description: '',
@@ -374,7 +379,8 @@ export default function TeacherDashboard() {
                 <input
                   type="text"
                   value={newAssignment.title}
-                  onChange={(e) => setNewAssignment({ ...newAssignment, title: e.target.value })}
+                  // ✅ ИСПРАВЛЕНО: Используем функциональную форму setState
+                  onChange={(e) => setNewAssignment(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Например: Собери триггер"
                   className="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white font-mono text-sm focus:border-purple-500 focus:outline-none transition-colors"
                 />
@@ -383,14 +389,16 @@ export default function TeacherDashboard() {
               <div>
                 <label className="text-xs font-mono text-gray-400 mb-2 block">МОДУЛЬ</label>
                 <div className="grid grid-cols-4 gap-2">
-                  {(['logic', 'algo', 'network', 'ai'] as const).map(m => {
+                  {/* ✅ ИСПРАВЛЕНО: Явно типизируем массив как ModuleType[] */}
+                  {(['logic', 'algo', 'network', 'ai'] as ModuleType[]).map(m => {
                     const Icon = MODULE_ICONS[m];
                     const isActive = newAssignment.module === m;
                     return (
                       <button
                         key={m}
                         type="button"
-                        onClick={() => setNewAssignment({ ...newAssignment, module: m })}
+                        // ✅ ИСПРАВЛЕНО: Используем функциональную форму setState
+                        onClick={() => setNewAssignment(prev => ({ ...prev, module: m }))}
                         className={`p-3 rounded-lg border font-mono text-xs transition-all flex flex-col items-center gap-2 ${
                           isActive
                             ? `${MODULE_COLORS[m]} border-2`
@@ -408,11 +416,13 @@ export default function TeacherDashboard() {
               <div>
                 <label className="text-xs font-mono text-gray-400 mb-2 block">СЛОЖНОСТЬ</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {(['easy', 'medium', 'hard'] as const).map(d => (
+                  {/* ✅ ИСПРАВЛЕНО: Явно типизируем массив как DifficultyType[] */}
+                  {(['easy', 'medium', 'hard'] as DifficultyType[]).map(d => (
                     <button
                       key={d}
                       type="button"
-                      onClick={() => setNewAssignment({ ...newAssignment, difficulty: d })}
+                      // ✅ ИСПРАВЛЕНО: Используем функциональную форму setState
+                      onClick={() => setNewAssignment(prev => ({ ...prev, difficulty: d }))}
                       className={`p-3 rounded-lg border font-mono text-xs transition-all ${
                         newAssignment.difficulty === d
                           ? d === 'easy' ? 'border-green-500 bg-green-500/10 text-green-400' :
@@ -431,7 +441,8 @@ export default function TeacherDashboard() {
                 <label className="text-xs font-mono text-gray-400 mb-2 block">ОПИСАНИЕ / КРИТЕРИИ</label>
                 <textarea
                   value={newAssignment.description}
-                  onChange={(e) => setNewAssignment({ ...newAssignment, description: e.target.value })}
+                  // ✅ ИСПРАВЛЕНО: Используем функциональную форму setState
+                  onChange={(e) => setNewAssignment(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Опиши, что нужно сделать и как будет оцениваться..."
                   rows={4}
                   className="w-full p-3 rounded-lg bg-gray-900 border border-gray-700 text-white font-mono text-sm focus:border-purple-500 focus:outline-none transition-colors resize-none"
